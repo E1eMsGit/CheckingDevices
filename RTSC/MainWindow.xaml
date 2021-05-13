@@ -1,0 +1,145 @@
+﻿<Window x:Class="RTSC.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:local="clr-namespace:RTSC"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        mc:Ignorable="d"     
+        DataContext="{Binding Source={StaticResource Locator}, Path=Main}"
+        
+        Title="Программа проверки ТА2006, ТА2007, ТА2008 и ТА1004М1" 
+        Height="763" Width="915"
+        WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize" 
+        FontFamily="{StaticResource MaterialDesignFont}"
+        TextElement.FontSize="15">
+    
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadedWindowCommand}"/>
+        </i:EventTrigger>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding CloseWindowCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+    <materialDesign:DialogHost CloseOnClickAway="False" Identifier="RootDialog">
+        <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
+            <materialDesign:DrawerHost.LeftDrawerContent>
+                <DockPanel MinWidth="220">
+                    <ToggleButton 
+                        Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
+                        DockPanel.Dock="Top"
+                        HorizontalAlignment="Right" 
+                        Margin="16"
+                        IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}" />
+
+                    <TextBlock Text="Меню" DockPanel.Dock="Top" Margin="16 4" Width="200" FontWeight="Bold"
+                               FontSize="17"/>
+
+                    <ListBox 
+                        x:Name="MainMenuItemsListBox" 
+                        Margin="0 16 0 16"
+                        SelectedIndex="{Binding DefaultMenuIndex}"
+                        SelectedItem="{Binding SelectedItem, UpdateSourceTrigger=PropertyChanged}"
+                        ItemsSource="{Binding MainMenuItems}"
+                        PreviewMouseLeftButtonUp="MainMenuItemSelect">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="MainMenuItem" >
+                                <StackPanel Orientation="Horizontal" Margin="10 0">
+                                    <materialDesign:PackIcon Kind="{Binding Icon}"
+                                                             Height="20" Width="20"
+                                                             VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Name}" 
+                                               Margin="16 0" 
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                        
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Margin" Value="{Binding Margin}"/>
+                                <Setter Property="BorderThickness" Value="0" />
+                                <Setter Property="Height" Value="40"/>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+                </DockPanel>
+            </materialDesign:DrawerHost.LeftDrawerContent>
+            <DockPanel>
+                <materialDesign:ColorZone Mode="PrimaryMid" 
+                                          Padding="13" 
+                                          DockPanel.Dock="Top"
+                                          materialDesign:ShadowAssist.ShadowDepth="Depth2">
+                    <DockPanel IsEnabled="{Binding IsHeaderEnabled}">
+                        <ToggleButton                            
+                            x:Name="MenuToggleButton"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource MaterialDesignHamburgerToggleButton}"
+                            IsChecked="False"/>
+                        
+                        <materialDesign:PopupBox DockPanel.Dock="Right" 
+                                                 PlacementMode="BottomAndAlignRightEdges"                                             
+                                                 StaysOpen="False">
+                            <StackPanel>
+                                <Button Command="{Binding OpenHelpCommand}">
+                                    <Button.Content>
+                                        <StackPanel Orientation="Horizontal">
+                                            <materialDesign:PackIcon Kind="InfoOutline"
+                                                                     Height="20" Width="20"
+                                                                     Margin="0 0 10 0"
+                                                                     VerticalAlignment="Center"/>
+                                            <TextBlock Text="Справка" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button.Content>
+                                </Button>
+                                <Button Command="{Binding TK158SettingsCommand}">
+                                    <Button.Content>
+                                        <StackPanel Orientation="Horizontal">
+                                            <materialDesign:PackIcon Kind="Settings"
+                                                                     Height="20" Width="20"
+                                                                     Margin="0 0 10 0"
+                                                                     VerticalAlignment="Center"/>
+                                            <TextBlock Text="Настройки ТК158" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button.Content>
+                                </Button>
+                                <Button Command="{Binding SaveLogCommand}">
+                                    <Button.Content>
+                                        <StackPanel Orientation="Horizontal">
+                                            <materialDesign:PackIcon Kind="ContentSave"
+                                                                     Height="20" Width="20"
+                                                                     Margin="0 0 10 0"
+                                                                     VerticalAlignment="Center"/>
+                                            <TextBlock Text="Сохранить отчет" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button.Content>
+                                </Button>
+                            </StackPanel>
+                        </materialDesign:PopupBox>
+                        <Button x:Name="debugSettingsButton" DockPanel.Dock="Right"
+                                Style="{StaticResource MaterialDesignIconForegroundButton}"
+                                Command="{Binding DebugSettingsCommand}" Visibility="Hidden">
+                            <Button.Content>
+                                <materialDesign:PackIcon Kind="SettingsBox"
+                                                         Height="30" Width="30"
+                                                         VerticalAlignment="Center"/>
+                            </Button.Content>
+                        </Button>
+                        <TextBlock Margin="70 0 0 0" 
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center" 
+                                   Text="{Binding ElementName=MainMenuItemsListBox, Path=SelectedItem.Name}"
+                                   Style="{StaticResource MaterialDesignHeadline6TextBlock}"/>
+                    </DockPanel>
+                </materialDesign:ColorZone>
+            
+                <ContentControl Grid.Row="1"
+                                IsEnabled="{Binding MainPanelEnabled}"
+                                Content="{Binding SelectedItem.Content, UpdateSourceTrigger=PropertyChanged}"/>
+            </DockPanel>
+        </materialDesign:DrawerHost>
+    </materialDesign:DialogHost>
+</Window>

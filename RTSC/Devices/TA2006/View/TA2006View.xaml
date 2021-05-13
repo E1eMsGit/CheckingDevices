@@ -1,0 +1,106 @@
+﻿<UserControl x:Class="RTSC.Devices.TA2006.View.TA2006View"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:helpers="clr-namespace:RTSC.Devices.Helpers" 
+             xmlns:local="clr-namespace:RTSC.Devices.TA2006.View"
+             xmlns:vm="clr-namespace:RTSC.Devices.TA2006.ViewModel"
+             mc:Ignorable="d" 
+             DataContext="{Binding Source={StaticResource Locator}, Path=TA2006}"
+              d:DesignHeight="725" d:DesignWidth="900">
+    
+    <UserControl.Resources>
+        <helpers:ByteToBitsConverter x:Key="ByteToBitsConverter"/>
+
+        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource MyDataGridColumnHeader}">
+            <Setter Property="Padding" Value="7"/>
+        </Style>
+
+        <Style TargetType="DataGridCell" BasedOn="{StaticResource MyDataGridCell}">
+            <Setter Property="Padding" Value="6.74"/>
+        </Style>
+    </UserControl.Resources>
+
+    <StackPanel Margin="10">
+        <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0 0 0 5">
+            <RadioButton Style="{StaticResource MaterialDesignTabRadioButton}"
+                         Margin="0 0 5 0"
+                         IsChecked="{Binding IsFirstComm}"
+                         Content="ПЕРВЫЙ КОММУТАТОР" />
+            <RadioButton Style="{StaticResource MaterialDesignTabRadioButton}"
+                         Margin="0 0 5 0"
+                         IsChecked="{Binding IsSecondComm}"
+                         Content="ВТОРОЙ КОММУТАТОР" />
+            <RadioButton Style="{StaticResource MaterialDesignTabRadioButton}"
+                         IsChecked="{Binding IsThirdComm}"
+                         Content="ТРЕТИЙ КОММУТАТОР" />
+        </StackPanel>
+
+        <materialDesign:Card>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+       
+                <local:TA2006DataGrid Grid.Column="0"
+                                      NewItemsSource="{Binding SourceItemsChannelContentFirstHalf}" />
+                <local:TA2006DataGrid Grid.Column="1"
+                                      NewItemsSource="{Binding SourceItemsChannelContentSecondHalf}"/>
+            </Grid>
+        </materialDesign:Card>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <materialDesign:Card Margin="0 10 10 0">
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton x:Name="binRb"
+                                 Content="Двоичный" 
+                                 Margin="10 0"                                 
+                                 Style="{StaticResource MaterialDesignAccentRadioButton}"/>
+                    <RadioButton x:Name="decRb"
+                                 Content="Десятичный" 
+                                 Margin="10 0"                                  
+                                 IsChecked="True"
+                                 Style="{StaticResource MaterialDesignAccentRadioButton}"/>
+                    <RadioButton x:Name="hexRb"
+                                 Content="Шестнадцатеричный"
+                                 Margin="10 0"                                 
+                                 Style="{StaticResource MaterialDesignAccentRadioButton}"/>
+                </StackPanel>
+            </materialDesign:Card>
+            
+            <materialDesign:Card Margin="0 10 0 0">
+                <StackPanel Orientation="Horizontal" Margin="10 0">
+                    <ComboBox Margin="0 0 20 10"    
+                          IsEnabled="{Binding IsControlsEnabled}"
+                          ItemsSource="{Binding ListAddressesCount}"   
+                          SelectedValue="{Binding SelectedAddress, Mode=TwoWay}"
+                          materialDesign:HintAssist.Hint="Адрес устройства" 
+                          Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Converter={StaticResource ByteToBitsConverter}}" HorizontalAlignment="Center"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                    <StackPanel Orientation="Horizontal">
+                        <ProgressBar Value="0" Margin="0 0 10 0"
+                             Style="{StaticResource MaterialDesignCircularProgressBar}"
+                             Visibility="{Binding ProgressBarVisibility}"
+                             IsIndeterminate="True" />
+                        <Button Style="{StaticResource SendButton}" 
+                                Command="{Binding StartCommand}">
+                            <Button.Content>
+                                <TextBlock Text="{Binding StartButtonText}"
+                                           Margin="25 0" FontSize="15"/>
+                            </Button.Content>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </materialDesign:Card>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

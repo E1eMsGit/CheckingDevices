@@ -1,0 +1,23 @@
+﻿<UserControl x:Class="RTSC.DialogWindows.NotificationDialogView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RTSC.DialogWindows"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d"
+             d:DesignHeight="150" d:DesignWidth="200"
+             TextElement.FontSize="15"
+             FontFamily="{StaticResource MaterialDesignFont}">
+    
+    <StackPanel Margin="20" MinWidth="150" MaxWidth="300"> 
+        <TextBlock Text="{Binding Title}" 
+                   Style="{StaticResource MaterialDesignHeadline6TextBlock}"/>
+        <TextBlock Text="{Binding Message}" 
+                   Margin="0 10 0 10" TextWrapping="Wrap" 
+                   Style="{StaticResource MaterialDesignBody2TextBlock}"/>
+        <Button Content="OK" HorizontalAlignment="Right"
+                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" 
+                Style="{StaticResource MaterialDesignFlatButton}"/>
+    </StackPanel>
+</UserControl>

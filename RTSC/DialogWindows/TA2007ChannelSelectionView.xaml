@@ -1,0 +1,70 @@
+﻿<UserControl x:Class="RTSC.DialogWindows.TA2007ChannelSelectionView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RTSC.DialogWindows"
+             mc:Ignorable="d" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             DataContext="{Binding Source={StaticResource Locator}, Path=TA2007ChannelSelection}"
+             d:DesignHeight="478" d:DesignWidth="350"
+             Width="350"
+             TextElement.FontSize="15"
+             FontFamily="{StaticResource MaterialDesignFont}">
+
+    <UserControl.Resources>
+        <DataTemplate x:Key="ListBoxItemTemplate" >
+            <CheckBox Content="{Binding Number}" 
+                      IsChecked="{Binding IsChecked}"
+                      IsEnabled="{Binding IsEnabled}"
+                      Focusable="False"
+                      FontSize="15"
+                      VerticalAlignment="Center">
+                <CheckBox.LayoutTransform>
+                    <ScaleTransform ScaleX="1.1" ScaleY="1.1" />
+                </CheckBox.LayoutTransform>
+            </CheckBox>
+        </DataTemplate>
+
+        <Style TargetType="CheckBox" BasedOn="{StaticResource MaterialDesignActionCheckBox}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Path=IsChecked}" Value="True">
+                    <Setter Property="Background" Value="Green"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="RadioButton" BasedOn="{StaticResource MaterialDesignAccentRadioButton}">
+            <Setter Property="Margin" Value="10 0"/>
+        </Style>
+    </UserControl.Resources>
+    
+    <StackPanel Margin="20">
+        <TextBlock Text="Выберите каналы"
+                   Style="{StaticResource MaterialDesignHeadline6TextBlock}"/>
+
+        <ListBox Margin="0 10 0 0" 
+                 ItemsSource="{Binding Channels}"
+                 ItemTemplate="{StaticResource ListBoxItemTemplate}">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+        </ListBox>
+                       
+        <StackPanel Orientation="Horizontal"
+                    Margin="0 10 0 0"
+                    HorizontalAlignment="Right">
+            <Button Content="Сброс" 
+                    Margin="10 0"
+                    FontSize="15"    
+                    Command="{Binding ResetChannelsCommand}" 
+                    Style="{StaticResource MaterialDesignFlatButton}"/>
+            <Button Content="Применить"     
+                    Command="{Binding ApplyChannelsCommand}" 
+                    Style="{StaticResource SendButton}"/>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

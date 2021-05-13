@@ -1,0 +1,214 @@
+﻿<UserControl x:Class="RTSC.Devices.TA1004M1.View.TA1004M1View"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RTSC.Devices.TA1004M1.View"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:helpers="clr-namespace:RTSC.Devices.Helpers" 
+             xmlns:ta1004m1helpers="clr-namespace:RTSC.Devices.TA1004M1.Helpers" 
+             xmlns:vm="clr-namespace:RTSC.Devices.TA1004M1.ViewModel" 
+             mc:Ignorable="d" 
+             DataContext="{Binding Source={StaticResource Locator}, Path=TA1004M1}"
+             d:DesignHeight="705" d:DesignWidth="900">
+
+    <UserControl.Resources>
+        <helpers:ByteToBitsConverter x:Key="ByteToBitsConverter"/>
+
+        <Style TargetType="TextBox" BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}">
+            <Setter Property="MaxLength" Value="4"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="MinWidth" Value="50"/>
+            <Setter Property="Margin" Value="0 0 30 18"/>
+        </Style>
+
+        <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource MyDataGridColumnHeader}"/>
+
+        <Style TargetType="DataGridCell" BasedOn="{StaticResource MyDataGridCell}">
+            <Setter Property="FontSize" Value="15"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="1.5*"/>
+            <ColumnDefinition Width="1.2*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="100"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Margin="0 0 20 0" Grid.Row="0" Grid.Column="0">
+            <TextBlock Text="Режим проверки" Style="{StaticResource MyGroupTitleTextBlock}"/>
+            <ListBox ItemsSource="{Binding Modes, Mode=OneTime}" 
+                     SelectedItem="{Binding SelectedMode, Mode=TwoWay}"
+                     IsEnabled="{Binding IsPanelEnabled}">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListBoxItem}">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                    <ContentPresenter/>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:TA1004M1TestMode}">
+                        <RadioButton Content="{Binding Title}" 
+                                     GroupName="Properties" 
+                                     Margin="{Binding Margin}"
+                                     Style="{StaticResource MaterialDesignAccentRadioButton}">
+                            <RadioButton.IsChecked>
+                                <Binding Path="IsSelected"
+                                         RelativeSource="{RelativeSource AncestorType=ListBoxItem}"
+                                         Mode="TwoWay" />
+                            </RadioButton.IsChecked>
+                        </RadioButton>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <TextBlock Text="Адреса устройств" 
+                       Style="{StaticResource MyGroupTitleTextBlock}"/>
+            <StackPanel Orientation="Horizontal" 
+                        IsEnabled="{Binding IsPanelEnabled}">
+                <TextBox PreviewTextInput="AddressPreviewTextInput" 
+                         materialDesign:HintAssist.Hint="АУ1">
+                    <TextBox.Text>
+                        <Binding Path="Address1" Mode="TwoWay" 
+                                 UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <ta1004m1helpers:TA1004M1AddressInputValidationRule ValidatesOnTargetUpdated="True"/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+
+                <TextBox PreviewTextInput="AddressPreviewTextInput"
+                         materialDesign:HintAssist.Hint="АУ2">
+                    <TextBox.Text>
+                        <Binding Path="Address2" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                            <Binding.ValidationRules>
+                                <ta1004m1helpers:TA1004M1AddressInputValidationRule ValidatesOnTargetUpdated="True"/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+            </StackPanel>
+        </StackPanel>
+
+        <DockPanel Grid.Row="1" Grid.Column="0" VerticalAlignment="Bottom" Margin="0 0 20 0">
+            <Border DockPanel.Dock="Top" Style="{StaticResource MyBorder}"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <ProgressBar Value="0" Margin="0 0 10 0"
+                             Style="{StaticResource MaterialDesignCircularProgressBar}"
+                             Visibility="{Binding ProgressBarVisibility}"
+                             IsIndeterminate="True" />
+                <Button Style="{StaticResource SendButton}" 
+                        Command="{Binding StartCommand}">
+                    <Button.Content>
+                        <TextBlock Text="{Binding StartButtonText}"
+                                   Margin="25 0" FontSize="15"/>
+                    </Button.Content>
+                </Button>
+            </StackPanel>
+        </DockPanel>
+
+        <materialDesign:Card Grid.Column="1" Grid.RowSpan="2" Margin="0 0 10 0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <materialDesign:ColorZone Grid.Row="0" 
+                                          Style="{StaticResource MyCardTitleColorZone}">
+                    <TextBlock x:Name="tbPassingInformation"
+                               Text="Проверка прохождения информации" 
+                               Style="{StaticResource MyCardTitleTextBlock}"/>
+                </materialDesign:ColorZone>
+
+                <DataGrid Grid.Row="1" IsReadOnly="True"
+                          ItemsSource="{Binding SourceItemsPassingInformation, Mode=OneWay}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Адрес"                                     
+                                            Binding="{Binding Address, Mode=OneTime}" 
+                                            Width="auto"/>
+                        <DataGridTextColumn Header="Номинал"
+                                            Binding="{Binding Denomination, Mode=OneTime}" 
+                                            Width="*"/>
+                        <DataGridTextColumn Header="Результат" 
+                                            Binding="{Binding Result, Mode=OneWay, Converter={StaticResource ByteToBitsConverter}, ConverterParameter=8}"
+                                            Width="*">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="{Binding Color}" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <TextBlock Grid.Row="2" 
+                           Text="{Binding ResultMessage}" 
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+            </Grid>
+        </materialDesign:Card>
+
+        <materialDesign:Card Grid.Column="2" Grid.Row="0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <materialDesign:ColorZone Grid.Row="0"
+                                          Style="{StaticResource MyCardTitleColorZone}">
+                    <TextBlock x:Name="tbOutputInformation"
+                               Text="Проверка входов информации" 
+                               Style="{StaticResource MyCardTitleTextBlock}"/>
+                </materialDesign:ColorZone>
+
+                <DataGrid Grid.Row="1" 
+                          IsReadOnly="True"
+                          ItemsSource="{Binding SourceItemsOutputInformation, Mode=OneWay}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Адрес"
+                                            Binding="{Binding Address, Mode=OneTime}" 
+                                            Width="auto"/>
+                        <DataGridTextColumn Header="Данные" 
+                                            Binding="{Binding Data, Mode=OneWay, Converter={StaticResource ByteToBitsConverter}, ConverterParameter=8}"
+                                            Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </materialDesign:Card>
+
+        <materialDesign:Card Grid.Column="2" Grid.Row="1" Margin="0 10 0 0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <materialDesign:ColorZone Grid.Row="0" Style="{StaticResource MyCardTitleColorZone}">
+                    <TextBlock x:Name="tbCodeBits"
+                               Text="Проверка разрядов кода"
+                               Style="{StaticResource MyCardTitleTextBlock}"/>
+                </materialDesign:ColorZone>
+
+                <TextBlock Grid.Row="1"
+                           Margin="10 0" 
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center" 
+                           Text="{Binding CodeBitsResult, Mode=OneWay, Converter={StaticResource ByteToBitsConverter}, ConverterParameter=8}"/>
+            </Grid>
+        </materialDesign:Card>
+    </Grid>
+</UserControl>

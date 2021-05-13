@@ -1,0 +1,204 @@
+﻿<UserControl x:Class="RTSC.Devices.TA2007.View.TA2007View"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RTSC.Devices.TA2007.View"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:helpers="clr-namespace:RTSC.Devices.Helpers" 
+             xmlns:ta2007helpers="clr-namespace:RTSC.Devices.TA2007.Helpers" 
+             mc:Ignorable="d" 
+             DataContext="{Binding Source={StaticResource Locator}, Path=TA2007}"
+              d:DesignHeight="680" d:DesignWidth="900">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Flipper.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <helpers:ByteToBitsConverter x:Key="ByteToBitsConverter"/>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        
+        <materialDesign:Card Grid.Row="0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <local:TA2007DataGrid Grid.Column="0" 
+                                      NewItemsSource="{Binding SourceItemsChannelContentFirstHalf}"/>
+                <local:TA2007DataGrid Grid.Column="1" 
+                                      NewItemsSource="{Binding SourceItemsChannelContentSecondHalf}"/>
+            </Grid>
+        </materialDesign:Card>
+
+        <Grid  Margin="0 10 0 0" Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition />
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+
+            <materialDesign:Flipper Grid.Column="0"
+                                    IsEnabled="{Binding IsControlsEnabled}"
+                                    Height="136"
+                                    Width="180"                                   
+                                    materialDesign:ShadowAssist.ShadowDepth="Depth1"
+                                    Style="{StaticResource MaterialDesignCardFlipper}">
+                <materialDesign:Flipper.FrontContent>
+                    <StackPanel Orientation="Vertical" Margin="10 5" Height="128">
+
+                        <TextBlock Text="Режим работы" Style="{StaticResource MyGroupTitleTextBlock}"/>
+                        <RadioButton Style="{StaticResource MaterialDesignAccentRadioButton}"
+                                     IsChecked="{Binding IsFunctionCheckTestChecked}">
+                            <RadioButton.Content>
+                                <TextBlock Text="{Binding FunctionCheckTestTitle}" TextWrapping="Wrap"/>
+                            </RadioButton.Content>
+                        </RadioButton>
+
+                        <RadioButton Margin="0 10 0 0"
+                                     Style="{StaticResource MaterialDesignAccentRadioButton}"
+                                     IsChecked="{Binding IsErrorCalculationTestChecked}"
+                                     Command="{x:Static materialDesign:Flipper.FlipCommand}">
+                            <RadioButton.Content>
+                                <TextBlock Text="{Binding ErrorCalculationTestTitle}" TextWrapping="Wrap" />
+                            </RadioButton.Content>
+                        </RadioButton>
+                    </StackPanel>
+                </materialDesign:Flipper.FrontContent>
+
+                <materialDesign:Flipper.BackContent>
+                    <Grid IsEnabled="{Binding IsControlsEnabled}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <materialDesign:ColorZone Mode="SecondaryMid" Grid.Row="0">
+                            <StackPanel Orientation="Horizontal">
+                                <Button Style="{StaticResource MaterialDesignToolForegroundButton}"
+                                        Command="{x:Static materialDesign:Flipper.FlipCommand}"
+                                        HorizontalAlignment="Left">
+                                    <materialDesign:PackIcon
+                                        Kind="ArrowLeft"
+                                        HorizontalAlignment="Right" />
+                                </Button>
+                                <TextBlock Margin="8 0 0 0" Text="Назад"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </materialDesign:ColorZone>
+
+                        <StackPanel Orientation="Vertical" Grid.Row="1" Margin="10 5">
+                            <RadioButton Style="{StaticResource MaterialDesignAccentRadioButton}"
+                                         Content="{Binding ResistanceTestTitle}"
+                                         IsChecked="{Binding IsResistanceTestChecked}"/>
+                            <RadioButton Margin="0 10 0 0"                                         
+                                         Style="{StaticResource MaterialDesignAccentRadioButton}"
+                                         Content="{Binding VoltageTestTitle}"
+                                         IsChecked="{Binding IsVoltageTestChecked}"/>
+                            <TextBox MaxLength="15" Margin="0 0 0 6"
+                                     PreviewTextInput="ValueValidationTextBox" 
+                                     Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                     materialDesign:HintAssist.Hint="{Binding ValueHintText}">
+                                <TextBox.Text>
+                                    <Binding Path="ValueForSecondTest" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                                        <Binding.ValidationRules>
+                                            <ta2007helpers:TA2007ValueForTestValidationRule ValidatesOnTargetUpdated="True"/>
+                                        </Binding.ValidationRules>
+                                    </Binding>
+                                </TextBox.Text>
+                            </TextBox>
+                        </StackPanel>
+                    </Grid>
+                </materialDesign:Flipper.BackContent>
+            </materialDesign:Flipper>
+
+            <materialDesign:Card Grid.Column="1" Margin="10 0 " IsEnabled="{Binding IsControlsEnabled}">
+                <StackPanel Orientation="Vertical" Margin="10 5">
+                    <ComboBox Margin="0 0 0 10"                                 
+                              ItemsSource="{Binding ListAddressesCount}"    
+                              SelectedValue="{Binding SelectedAddress, Mode=TwoWay}"
+                              materialDesign:HintAssist.Hint="Адрес устройства" 
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Converter={StaticResource ByteToBitsConverter}}" HorizontalAlignment="Center"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                    <Button Margin="0 0 0 10"
+                            FontSize="15"
+                            Content="Каналы" 
+                            Command="{Binding ShowChannelSelectionCommand}"/>
+
+                    <CheckBox Content="Фазировка" 
+                              FontSize="15" 
+                              ToolTip="Отправлять фазировку в каждой посылке"
+                              IsChecked="{Binding IsPhasing}" 
+                              IsEnabled="{Binding IsPhasingEnabled}"/>
+                </StackPanel>
+            </materialDesign:Card>
+
+            <materialDesign:Card Grid.Column="2" Margin="0 0 10 0">
+                <Grid Margin="10 5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="Результат" Style="{StaticResource MyGroupTitleTextBlock}"/>
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                        <TextBlock Text="{Binding ResultText}" />
+                    </ScrollViewer>
+                </Grid>
+            </materialDesign:Card>
+
+            <StackPanel Grid.Column="3"
+                        VerticalAlignment="Bottom"
+                        HorizontalAlignment="Right">
+                
+                <materialDesign:Card Margin="0 0 0 10">
+                    <StackPanel Background="White" Margin="10 5" Orientation="Horizontal">
+                        <StackPanel>
+                            <TextBlock Text="Фазировка" Margin="0 5 0 10"/>
+                            <TextBlock Text="Синхронизация" Margin="0 5 0 5"/>
+                        </StackPanel>
+
+                        <StackPanel Margin="20 0 0 0">
+                            <Ellipse Fill="{Binding PhasingColor}" Width="29.9" Height="29.9"/>
+                            <Ellipse Fill="{Binding SyncColor}" Width="29.9" Height="29.9" Margin="0 5 0 0"/>
+                        </StackPanel>
+                    </StackPanel>
+            </materialDesign:Card>
+                
+                <materialDesign:Card>
+                    <StackPanel Orientation="Horizontal" Margin="10">
+                        <StackPanel Orientation="Horizontal" Margin="10 0 0 0">
+                            <ProgressBar Value="{Binding ProgressBarValue}" 
+                                         Margin="0 0 10 0"
+                                         Style="{StaticResource MaterialDesignCircularProgressBar}"
+                                         Visibility="{Binding ProgressBarVisibility}"
+                                        IsIndeterminate="{Binding ProgressBarIndeterminate}" />
+                            <Button Style="{StaticResource SendButton}" 
+                                    Command="{Binding StartCommand}"
+                                    IsEnabled="{Binding IsStartButtonEnabled}">
+                                <Button.Content>
+                                    <TextBlock Text="{Binding StartButtonText}"
+                                               Margin="25 0" FontSize="15"/>
+                                </Button.Content>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </materialDesign:Card>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>
